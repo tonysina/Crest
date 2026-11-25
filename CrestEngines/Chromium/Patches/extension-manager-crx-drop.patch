@@ -1,0 +1,29 @@
+# Crest: a package dropped on the extension manager installs without
+# Chromium's post-install bubble, which has no toolbar to sit on in Crest.
+
+--- a/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
++++ b/chrome/browser/extensions/api/developer_private/developer_private_functions.cc
+@@ -3,6 +3,9 @@
+ // found in the LICENSE file.
+ 
+ #include "chrome/browser/extensions/api/developer_private/developer_private_functions.h"
++#if BUILDFLAG(IS_MAC)
++#include "chrome/browser/ui/crest/crest_chrome_hooks.h"
++#endif
+ 
+ #include <stddef.h>
+ 
+@@ -1095,6 +1098,13 @@
+     auto prompt = std::make_unique<ExtensionInstallPrompt>(
+         web_contents, std::make_unique<extensions::InstallPromptData>(
+                           extensions::InstallPromptData::UNSET_PROMPT_TYPE));
++#if BUILDFLAG(IS_MAC)
++    // Crest: no toolbar holds Chromium's post-install bubble, so it would
++    // open as a stray window; the extension shows in the manager instead.
++    if (crest::IsEnabled()) {
++      prompt->SetSkipPostInstallUI(true);
++    }
++#endif
+     scoped_refptr<CrxInstaller> crx_installer =
+         CrxInstaller::Create(browser_context(), std::move(prompt));
+     crx_installer->set_error_on_unsupported_requirements(true);

@@ -140,6 +140,7 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/toasts/api/toast_id.h"
+#include "chrome/common/webui_url_constants.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
@@ -149,6 +150,7 @@
 #include "ui/views/widget/widget.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/common/drop_data.h"
+#include "content/public/common/url_constants.h"
 #include "net/base/apple/url_conversions.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "mojo/public/cpp/bindings/receiver.h"
@@ -1139,10 +1141,15 @@ void ShowExtensionPrompt(
   auto pending = std::make_shared<PendingPrompt>(std::move(params), std::move(callback), std::move(prompt));
   // Crest's own installs ask the core through the prompt they install
   // with, and never come here. An install the engine began by itself in a
-  // Crest window, such as a package dropped on the extension manager, has no
-  // review in Crest to answer it, and Crest's review is the only consent an
-  // install in its windows gets, so it is declined.
-  if (window.identifier && crest::ParseGuid(base::SysNSStringToUTF8(window.identifier)) &&
+  // Crest window has no review in Crest to answer it, and Crest's review is
+  // the only consent an install in its windows gets, so it is declined. A
+  // package dropped on the extension manager, which takes drops only in
+  // developer mode, is the exception: the dialog below asks, as in Chrome.
+  content::WebContents* parent = pending->params->GetParentWebContents();
+  const GURL& page = parent ? parent->GetLastCommittedURL() : GURL::EmptyGURL();
+  const bool from_extension_manager =
+      page.SchemeIs(content::kChromeUIScheme) && page.host() == chrome::kChromeUIExtensionsHost;
+  if (!from_extension_manager && window.identifier && crest::ParseGuid(base::SysNSStringToUTF8(window.identifier)) &&
       pending->prompt->type() == extensions::InstallPromptData::INSTALL_PROMPT) {
     pending->prompt->OnDialogCanceled();
     std::move(pending->callback).Run(Payload(Result::USER_CANCELED));

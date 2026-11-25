@@ -542,5 +542,9 @@
   "content/browser/picture_in_picture/video_picture_in_picture_window_controller_impl.cc": {
     "before": "1901fac89378723459239b047613f7969922da26235f085ca6152c069d664ab9",
     "after": "837d6f91b28897fbe9696ef5c0553c4fe925b6d526c60f03af9feb2154820c7c"
+  },
+  "chrome/browser/extensions/api/developer_private/developer_private_functions.cc": {
+    "before": "a15138f672f73903b49e0798c15177525311cc09b7e5d1b98545c65cacab48af",
+    "after": "4f0a9b2e168cd4f9c9a66984f506fc48e3460585895b607a88c7cfb3fc5a61ce"
   }
 }

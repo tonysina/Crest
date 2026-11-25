@@ -1,0 +1,10 @@
+{
+  "entries": [
+    {
+      "id": "extension-manager-installs-dropped-crx",
+      "category": "fixed",
+      "message": "Drop a .crx package on Chromium's extension manager in developer mode to install it. Crest asks before it adds the extension, and the extension keeps its own updates.",
+      "platforms": ["mac"]
+    }
+  ]
+}
